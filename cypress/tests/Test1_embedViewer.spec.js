@@ -1,3 +1,4 @@
+import '../support/commands.js';
 
 describe('Embed PDF viewer', function () {
 	it('Checks presence of PDF embed viewer at workflows', function () {
