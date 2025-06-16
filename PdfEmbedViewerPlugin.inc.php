@@ -25,9 +25,9 @@ class PdfEmbedViewerPlugin extends GenericPlugin
             return true;
         }
 
-        // if ($success && $this->getEnabled($mainContextId)) {
-        //  Add hooks
-        // }
+        if ($success && $this->getEnabled($mainContextId)) {
+            HookRegistry::register('Template::Workflow::Publication', array($this, 'addPdfEmbedViewer'));
+        }
 
         return $success;
     }
@@ -40,5 +40,18 @@ class PdfEmbedViewerPlugin extends GenericPlugin
     public function getDescription()
     {
         return __('plugins.generic.pdfEmbedViewer.description');
+    }
+
+    public function addPdfEmbedViewer($hookName, $params)
+    {
+        $templateMgr = &$params[1];
+        $output = &$params[2];
+
+        $pdfJsViewerPlugin = PluginRegistry::getPlugin('generic', 'pdfjsviewerplugin');
+        $request = Application::get()->getRequest();
+
+        $templateMgr->assign('pdfJsViewerPluginUrl', $request->getBaseUrl() . '/' . $pdfJsViewerPlugin->getPluginPath());
+
+        $output .= sprintf('%s', $templateMgr->fetch($this->getTemplateResource('pdfEmbedViewer.tpl')));
     }
 }
