@@ -114,7 +114,7 @@ describe('Embed PDF viewer', function () {
         cy.get('#titleAbstract-button').click();
         cy.get('input[id^="titleAbstract-title-control-en_US"').type(' plus text', {delay: 0});
         cy.contains('button', 'Save').click();
-        cy.wait(2000);
+        cy.wait(3000);
 
         cy.get('#galleys-button').click();
         cy.contains('a', 'PDF');
