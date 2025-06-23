@@ -1,4 +1,4 @@
-<div id="pdfEmbedViewer" style="display: none;">
+<div id="pdfEmbedViewerTemplate" style="display: none;">
     <iframe
         src=""
         width="100%"
@@ -10,36 +10,44 @@
 </div>
 
 <script>
-    function setAndDisplayEmbedViewer(pdfEmbedViewerUrl, galleyTabTbody) {
-        let trs = galleyTabTbody.querySelectorAll('tr');
-        let downloadLink = trs[0].querySelector('a.pkp_linkaction_downloadFile');
-        let embedPdfUrl = downloadLink.getAttribute('href');
-        
-        $("#pdfEmbedViewer > iframe").attr("src", pdfEmbedViewerUrl + encodeURIComponent(embedPdfUrl));
-        $(trs[1]).after($("#pdfEmbedViewer"));
-        $("#pdfEmbedViewer").css("display", "block");
+    function setAndDisplayEmbedViewer() {
+        let pdfEmbedViewer = document.getElementById('pdfEmbedViewer');
+        if (pdfEmbedViewer) {
+            pdfEmbedViewer.remove();
+        }
+
+        let pdfEmbedViewerUrl = "{$pdfJsViewerPluginUrl}/pdf.js/web/viewer.html?file=";
+        let trs = document.getElementById('galleys').querySelector('tbody').querySelectorAll('tr');
+        if (trs.length >= 2) {
+            let downloadLink = trs[0].querySelector('a.pkp_linkaction_downloadFile');
+            if (downloadLink) {
+                let embedPdfUrl = downloadLink.getAttribute('href');
+                let pdfEmbedViewer = document.getElementById('pdfEmbedViewerTemplate').cloneNode(true);
+                pdfEmbedViewer.id = 'pdfEmbedViewer';
+                document.body.appendChild(pdfEmbedViewer);
+
+                $("#pdfEmbedViewer > iframe").attr("src", pdfEmbedViewerUrl + encodeURIComponent(embedPdfUrl));
+                $(trs[1]).after($("#pdfEmbedViewer"));
+                $("#pdfEmbedViewer").css("display", "block");
+            }
+        }
+    }
+
+    function listenToGalleyGridRequests() {
+        const originalOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            if (url.search('article-galley-grid') >= 0 && (url.search('fetch-grid') >= 0 || url.search('fetch-row') >= 0)) {
+                this.addEventListener('load', function() {
+                    setTimeout(function() {
+                        setAndDisplayEmbedViewer();
+                    }, 2000);
+                });
+            }
+            originalOpen.apply(this, arguments);
+        };
     }
     
     $(document).ready(function() {
-        setTimeout(function() {
-            let pdfEmbedViewerUrl = "{$pdfJsViewerPluginUrl}/pdf.js/web/viewer.html?file=";
-            let galleysTabTbodies = document.getElementById('galleys').querySelectorAll('tbody');
-
-            if (galleysTabTbodies[1].style.display === 'none') {
-                setAndDisplayEmbedViewer(pdfEmbedViewerUrl, galleysTabTbodies[0]);
-            }
-            
-            const secondTbodyObserver = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'style') {
-                        if (galleysTabTbodies[1].style.display !== 'none') {
-                            $("#pdfEmbedViewer").css("display", "none");
-                        }
-                    }
-                });
-            });
-            
-            secondTbodyObserver.observe(galleysTabTbodies[1], { attributes: true, attributeFilter: ['style'] });
-        }, 3000);
+        listenToGalleyGridRequests();
     });
 </script>
