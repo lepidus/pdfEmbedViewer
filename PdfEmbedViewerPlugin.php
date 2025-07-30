@@ -13,7 +13,12 @@
  * @brief 'PDF Embed Viewer' plugin
  */
 
-import('lib.pkp.classes.plugins.GenericPlugin');
+namespace APP\plugins\generic\pdfEmbedViewer;
+
+use PKP\plugins\GenericPlugin;
+use APP\core\Application;
+use PKP\plugins\Hook;
+use PKP\plugins\PluginRegistry;
 
 class PdfEmbedViewerPlugin extends GenericPlugin
 {
@@ -21,12 +26,12 @@ class PdfEmbedViewerPlugin extends GenericPlugin
     {
         $success = parent::register($category, $path, $mainContextId);
 
-        if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) {
-            return true;
+        if (Application::isUnderMaintenance()) {
+            return $success;
         }
 
         if ($success && $this->getEnabled($mainContextId)) {
-            HookRegistry::register('Template::Workflow::Publication', array($this, 'addPdfEmbedViewer'));
+            Hook::add('Template::Workflow::Publication', [$this, 'addPdfEmbedViewer']);
         }
 
         return $success;
