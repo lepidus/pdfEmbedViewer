@@ -78,7 +78,7 @@ describe('Embed PDF viewer', function () {
         cy.get('#pdfEmbedViewer').should('exist');
 
         cy.get('#titleAbstract-button').click();
-        cy.get('input[id^="titleAbstract-title-control-en"').type(' plus text', {delay: 0});
+        cy.setTinyMceContent('titleAbstract-title-control-en', submissionData.title + ' plus text');
         cy.contains('button', 'Save').click();
         cy.wait(3000);
 
