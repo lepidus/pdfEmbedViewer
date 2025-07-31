@@ -36,7 +36,7 @@
     function listenToGalleyGridRequests() {
         const originalOpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url) {
-            if (url.search('article-galley-grid') >= 0 && (url.search('fetch-grid') >= 0 || url.search('fetch-row') >= 0)) {
+            if (url.search('preprint-galley-grid') >= 0 && (url.search('fetch-grid') >= 0 || url.search('fetch-row') >= 0)) {
                 this.addEventListener('load', function() {
                     setTimeout(function() {
                         setAndDisplayEmbedViewer();

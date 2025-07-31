@@ -5,7 +5,7 @@ This plugin adds a PDF viewer to the submission workflow page, allowing users to
 ## Compatibility
 
 This plugin is compatible with **OPS** in the following versions:
-* 3.3.0
+* 3.4.0
 
 ## Installation
 
